@@ -624,7 +624,7 @@ pub enum Mode {
     Entry,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
     #[serde(default)]
@@ -668,8 +668,32 @@ pub struct Config {
     #[serde(default)]
     pub force_all_transforms: bool,
 
-    #[serde(default)]
+    #[serde(default = "default_bugfixes")]
     pub bugfixes: bool,
+}
+
+fn default_bugfixes() -> bool {
+    true
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            mode: None,
+            debug: false,
+            dynamic_import: false,
+            loose: false,
+            skip: Vec::new(),
+            include: Vec::new(),
+            exclude: Vec::new(),
+            core_js: None,
+            targets: None,
+            path: None,
+            shipped_proposals: false,
+            force_all_transforms: false,
+            bugfixes: true,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default)]

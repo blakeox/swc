@@ -63,6 +63,9 @@ struct PresetConfig {
 
     #[serde(default)]
     pub debug: bool,
+
+    #[serde(default)]
+    pub bugfixes: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -137,7 +140,7 @@ fn exec(c: PresetConfig, dir: PathBuf) -> Result<(), Error> {
                         loose: true,
                         // TODO
                         dynamic_import: true,
-                        bugfixes: false,
+                        bugfixes: c.bugfixes.unwrap_or(false),
                         include: c.include,
                         exclude: c.exclude,
                         core_js: match c.corejs {
