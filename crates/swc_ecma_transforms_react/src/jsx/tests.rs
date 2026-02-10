@@ -820,6 +820,77 @@ test!(
 const x = <div>{variable} &ndash; something</div>;"#
 );
 
+// See https://github.com/swc-project/swc/issues/11541
+// Leading whitespace before charCode should be preserved
+test!(
+    module,
+    ::swc_ecma_parser::Syntax::Es(::swc_ecma_parser::EsSyntax {
+        jsx: true,
+        ..Default::default()
+    }),
+    |t| tr(t, Default::default(), Mark::fresh(Mark::root())),
+    react_should_preserve_leading_whitespace_before_charcode,
+    r#"<span> &#8226; </span>;"#
+);
+
+// See https://github.com/swc-project/swc/issues/11541
+// Two spaces before charCode should preserve one leading space
+test!(
+    module,
+    ::swc_ecma_parser::Syntax::Es(::swc_ecma_parser::EsSyntax {
+        jsx: true,
+        ..Default::default()
+    }),
+    |t| tr(t, Default::default(), Mark::fresh(Mark::root())),
+    react_should_preserve_leading_whitespace_before_charcode_2,
+    r#"<span>  &#8226;</span>;"#
+);
+
+// See https://github.com/swc-project/swc/issues/11541
+// Multiline: leading whitespace before charCode on next line
+test!(
+    module,
+    ::swc_ecma_parser::Syntax::Es(::swc_ecma_parser::EsSyntax {
+        jsx: true,
+        ..Default::default()
+    }),
+    |t| tr(t, Default::default(), Mark::fresh(Mark::root())),
+    react_should_preserve_whitespace_before_charcode_multiline,
+    r#"<span>
+  &#8226;
+</span>;"#
+);
+
+// See https://github.com/swc-project/swc/issues/11541
+// Multiline with content before and after charcode
+test!(
+    module,
+    ::swc_ecma_parser::Syntax::Es(::swc_ecma_parser::EsSyntax {
+        jsx: true,
+        ..Default::default()
+    }),
+    |t| tr(t, Default::default(), Mark::fresh(Mark::root())),
+    react_should_preserve_whitespace_around_charcode_multiline,
+    r#"<span>
+  &#8226; text
+</span>;"#
+);
+
+// See https://github.com/swc-project/swc/issues/11541
+// First line leading whitespace should be preserved with entities on second
+// line
+test!(
+    module,
+    ::swc_ecma_parser::Syntax::Es(::swc_ecma_parser::EsSyntax {
+        jsx: true,
+        ..Default::default()
+    }),
+    |t| tr(t, Default::default(), Mark::fresh(Mark::root())),
+    react_should_preserve_first_line_leading_ws_with_entity,
+    r#"<div>  hello  &#8226;
+world</div>;"#
+);
+
 test!(
     module,
     // Comments are currently stripped out

@@ -1838,20 +1838,27 @@ fn jsx_text_to_str_with_entity_mask(t: &str, entity_mask: &[bool]) -> Atom {
     // Track if we've seen any line terminators - used to decide whether to trim
     // leading whitespace on the final line
     let mut seen_line_terminator = false;
+    // The first line preserves leading whitespace (matching TypeScript behavior
+    // where firstNonWhitespace starts at 0)
+    let mut is_first_line = true;
 
     for (char_idx, c) in chars.iter().enumerate() {
         let is_from_entity = *entity_mask.get(char_idx).unwrap_or(&false);
 
         if is_line_terminator(*c) {
             seen_line_terminator = true;
-            // Process current line - trim both leading AND trailing (intermediate
-            // line)
+            // Process current line:
+            // - First line: preserve leading whitespace, trim trailing (trimRight)
+            // - Intermediate lines: trim both leading and trailing
             if let (Some(start), Some(end)) = (line_start, line_end) {
-                let line_text = extract_line_content(&chars, start, end, entity_mask, true, true);
+                let trim_leading = !is_first_line;
+                let line_text =
+                    extract_line_content(&chars, start, end, entity_mask, trim_leading, true);
                 add_line_of_jsx_text_owned(line_text, &mut acc, &mut only_line);
             }
             line_start = None;
             line_end = None;
+            is_first_line = false;
         } else if !is_white_space_single_line(*c) || is_from_entity {
             // Non-whitespace or entity-derived whitespace - counts as content
             line_end = Some(char_idx + 1);
